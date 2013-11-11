@@ -1,0 +1,93 @@
+/**
+ * Created by developkim on 2013. 11. 11..
+ */
+
+(function($){
+
+    //plugin definition
+    $.fn.gnbNav = function(options){
+
+        //extend default option with custom options
+        var options = $.extend({}, $.fn.gnbNav.defaults, options);
+
+        return this.each(function(){
+            var obj = $(this),
+                items = $(options.anchor, obj);
+
+            if(options.exception){
+                items =$(items).not(options.exception);
+            }
+
+            $.fn.gnbNav.bindingAnchor(items, options);
+            if(options.bindingwindow){
+                $.fn.gnbNav.bindingWindow(items, options);
+            }
+        });
+    };
+
+    $.fn.gnbNav.defaults =  {
+        easing       : 'easeOutExpo',
+        duration     : 1000,
+        anchor       : 'li a',
+        exception    : null,
+        activeclass  : 'active',
+        wrapper      : null,
+        bindingwindow: true,
+        correction   : 0
+    };
+
+    $.fn.gnbNav.bindingAnchor = function(items, options){
+
+        $(items).bind('click', function(event){
+            var $anchor = $(this);
+
+            $('html, body').stop().animate({
+                scrollTop: $($anchor.attr('href')).offset().top
+            }, options.duration, options.easing);
+            event.preventDefault();
+        });
+    };
+
+    $.fn.gnbNav.bindingWindow = function(items, options){
+
+        $(window).scroll(function(){
+            var scrollTop = $(this).scrollTop();
+            if(options.wrapper){
+                scrollTop += parseInt($(options.wrapper).outerHeight());
+            }
+
+            if(options.correction > 0){
+                scrollTop += options.correction;
+            }
+
+            _set_section_position(items, $(this).scrollTop(), options.activeclass);
+        });
+
+    }
+
+    var _set_section_position = function(items, scrollTop, activeclass){
+        scrollTop += 1;
+        //네비게이션 링크들을 반복 조회
+        $(items).each(function(idx, el){
+            var sectionNo = $(el).attr('href').replace('#', ''),
+                oSectionTop = $('#' + sectionNo).offset().top;
+            //href 값으로 검증할 section을 지정
+
+            if(idx == (items.length - 1) && ( scrollTop > oSectionTop )){
+                //배열의 마지막 이면 스크롤 값이 큰지만 확인한다.
+                $(items).parents('li').removeClass(activeclass);
+                $(this).parents('li').addClass(activeclass);
+            }else if(idx != (items.length - 1)){
+                //마지막이 아닌 경우는 현재 와 다음 section 의 높이를 같이 구해서 비교한다.
+                var nextNo = $(items[idx + 1]).attr('href').replace('#', ''),
+                    oNextTop = $('#' + nextNo).offset().top;
+                if(scrollTop > oSectionTop && scrollTop <= oNextTop){
+                    $(items).parents('li').removeClass(activeclass);
+                    $(this).parents('li').addClass(activeclass);
+                }
+            }
+
+        });
+
+    }
+})(jQuery);
