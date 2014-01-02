@@ -33,18 +33,22 @@
         activeclass  : 'active',
         wrapper      : null,
         bindingwindow: true,
-        correction   : 0
+        correction   : null
     };
 
     $.fn.gnbNav.bindingAnchor = function(items, options){
 
         $(items).bind('click', function(event){
-            var $anchor = $(this);
-
-            $('html, body').stop().animate({
-                scrollTop: $($anchor.attr('href')).offset().top
-            }, options.duration, options.easing);
             event.preventDefault();
+            var $anchor = $(this),
+                scrollVal = parseInt($($anchor.attr('href')).offset().top);
+            if(options.correction){
+                var correction_val = _get_correction_value(options.correction, scrollVal, $anchor);
+                scrollVal += correction_val;
+            }
+            $('html, body').stop().animate({
+                scrollTop: scrollVal
+            }, options.duration, options.easing);
         });
     };
 
@@ -56,12 +60,29 @@
                 scrollTop += parseInt($(options.wrapper).outerHeight());
             }
 
-            if(options.correction > 0){
+            if(options.correction != 0){
                 scrollTop += options.correction;
             }
 
             _set_section_position(items, $(this).scrollTop(), options.activeclass);
         });
+
+    }
+
+    var _get_correction_value = function(correction_option , scrollVal,  oAnchor){
+        var correction_type = typeof correction_option;
+
+        if(correction_type == 'number'){
+            return parseInt(scrollVal + correction_option);
+
+        }else if(correction_type== 'object'){
+            var str_hash = $(oAnchor).attr('href');
+            var return_correction_val = correction_option[str_hash] == undefined ? 0 : correction_option[str_hash];
+            return return_correction_val;
+        }else{
+            console.warn('not defined type');
+            return;
+        }
 
     }
 
@@ -91,3 +112,4 @@
 
     }
 })(jQuery);
+
