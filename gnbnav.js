@@ -5,10 +5,10 @@
 (function($){
 
     //plugin definition
-    $.fn.gnbNav = function(options){
+    $.fn.gnb = function(options){
 
         //extend default option with custom options
-        var options = $.extend({}, $.fn.gnbNav.defaults, options);
+        var options = $.extend({}, $.fn.gnb.defaults, options);
 
         return this.each(function(){
             var obj = $(this),
@@ -18,15 +18,15 @@
                 items =$(items).not(options.exception);
             }
 
-            $.fn.gnbNav.bindingAnchor(items, options);
+            $.fn.gnb.bindingAnchor(items, options);
             if(options.bindingwindow){
-                $.fn.gnbNav.bindingWindow(items, options);
+                $.fn.gnb.bindingWindow(items, options);
             }
         });
     };
 
-    $.fn.gnbNav.defaults =  {
-        easing       : 'easeOutExpo',
+    $.fn.gnb.defaults =  {
+        easing       : 'swing',
         duration     : 1000,
         anchor       : 'li a',
         exception    : null,
@@ -36,7 +36,7 @@
         correction   : null
     };
 
-    $.fn.gnbNav.bindingAnchor = function(items, options){
+    $.fn.gnb.bindingAnchor = function(items, options){
 
         $(items).bind('click', function(event){
             event.preventDefault();
@@ -52,7 +52,7 @@
         });
     };
 
-    $.fn.gnbNav.bindingWindow = function(items, options){
+    $.fn.gnb.bindingWindow = function(items, options){
 
         $(window).scroll(function(){
             var scrollTop = $(this).scrollTop();
@@ -64,7 +64,7 @@
                 scrollTop += options.correction;
             }
 
-            _set_section_position(items, $(this).scrollTop(), options.activeclass);
+            _set_section_position(items, $(this).scrollTop(), options.activeclass, options.correction);
         });
 
     }
@@ -86,13 +86,16 @@
 
     }
 
-    var _set_section_position = function(items, scrollTop, activeclass){
+    var _set_section_position = function(items, scrollTop, activeclass, correction){
         scrollTop += 1;
         //네비게이션 링크들을 반복 조회
         $(items).each(function(idx, el){
             var sectionNo = $(el).attr('href').replace('#', ''),
                 oSectionTop = $('#' + sectionNo).offset().top;
             //href 값으로 검증할 section을 지정
+            if(correction != null && correction['#' + sectionNo]){
+                oSectionTop += correction['#' + sectionNo];
+            }
 
             if(idx == (items.length - 1) && ( scrollTop > oSectionTop )){
                 //배열의 마지막 이면 스크롤 값이 큰지만 확인한다.
@@ -112,4 +115,3 @@
 
     }
 })(jQuery);
-
