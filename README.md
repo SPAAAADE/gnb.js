@@ -3,6 +3,7 @@ gnb.js
 
 jQuery plugin for GNB navigation and scroll to menu
 
+###Usage
 HTML Markup
 ```
 <ul id="gnb">
@@ -61,3 +62,7 @@ bindingwindow: true,   // bind scroll event window that set menu active
 correction   : null         // value of correction ,that scroll offset position
 };
 ```
+
+### Example
+* [Latis Global](http://latisglobal.com/en/) 
+* [올댓스토리](http://allthatstory.co.kr/about_en)
